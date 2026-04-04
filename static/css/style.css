@@ -1,0 +1,64 @@
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #1a1a2e;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #16213e;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.fish-image {
+    width: 100%;
+    max-width: 400px;
+    border: 4px solid #0f3460;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+input[type="text"] {
+    padding: 12px;
+    width: 80%;
+    font-size: 18px;
+    border-radius: 5px;
+    border: none;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 12px 30px;
+    font-size: 18px;
+    background-color: #e94560;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #ff2e63;
+}
+
+.result {
+    margin-top: 15px;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.correct { background-color: #28a745; }
+.wrong { background-color: #dc3545; }
+
+.finish-area a {
+    color: #4ecca3;
+    text-decoration: none;
+    font-weight: bold;
+}
