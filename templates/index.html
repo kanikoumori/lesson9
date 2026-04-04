@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>魚の名前を答えろ！</h1>
+        <h1>魚の名前を答えろ！</h1><p>第 {{ step }} 問 / 全 {{ total if finished else 5 }} 問</p>
 
         {% if not finished %}
             {% if last_result %}
