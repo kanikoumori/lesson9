@@ -3,8 +3,8 @@ import random
 from flask import Flask, render_template, request, session, redirect, url_for
 
 app = Flask(__name__)
-# 秘密鍵を固定値に設定（Renderでのエラー回避用）
-app.secret_key = "fish_quiz_fixed_key_12345"
+# 秘密鍵を設定
+app.secret_key = "fish_quiz_stable_key_999"
 
 # 魚のデータセット
 FISH_DATA = [
@@ -23,7 +23,8 @@ FISH_DATA = [
 @app.route("/", methods=["GET", "POST"])
 def index():
     # ゲームの初期化
-    if "quiz_list" not in session or (request.method == "GET" and not request.args.get("continue")):
+    # URLに 'next' という文字が入っていない、かつGETアクセスの時だけリセットする
+    if "quiz_list" not in session or (request.method == "GET" and not request.args.get("next")):
         all_indices = list(range(len(FISH_DATA)))
         random.shuffle(all_indices)
         session["quiz_list"] = all_indices[:5]
@@ -36,14 +37,13 @@ def index():
     # 5問終了判定
     if current_step >= 5:
         score = session.get("score", 0)
-        # 終了時にリストを消してリセット可能にする
         session.pop("quiz_list", None)
         return render_template("index.html", finished=True, score=score, total=5)
 
     fish_index = session["quiz_list"][current_step]
     fish = FISH_DATA[fish_index]
     
-    # 表示用の判定結果を取得し、セッションからは消す（一回切り表示）
+    # 前回の判定結果を取得し、セッションからは一度消す（リロード対策）
     last_result = session.get("last_result")
     session["last_result"] = None
 
@@ -57,7 +57,8 @@ def index():
             session["last_result"] = {"status": "wrong", "msg": f"残念！正解は {fish['name']} でした。"}
         
         session["current_step"] = current_step + 1
-        return redirect(url_for("index", continue="true"))
+        # 'continue' を避け 'next' に変更
+        return redirect(url_for("index", next="step"))
 
     return render_template("index.html", 
                            fish=fish, 
@@ -66,6 +67,5 @@ def index():
                            step=current_step + 1)
 
 if __name__ == "__main__":
-    # Renderのポート指定に対応
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
