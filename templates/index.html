@@ -11,20 +11,23 @@
 
     <div class="container">
         <h1>魚の名前を答えろ！</h1>
-        
-        {% if not finished %}
-            <p>第 {{ step }} 問 / 全 5 問</p>
 
+        {% if select_level %}
+            <div class="level-select">
+                <p>難易度を選んでください</p>
+                <a href="{{ url_for('start_game', level='easy') }}" class="btn-level">初級 (3問)</a><br>
+                <a href="{{ url_for('start_game', level='normal') }}" class="btn-level">中級 (5問)</a><br>
+                <a href="{{ url_for('start_game', level='hard') }}" class="btn-level">上級 (10問)</a>
+            </div>
+        {% elif not finished %}
+            <p>第 {{ step }} 問 / 全 {{ total }} 問</p>
             {% if last_result %}
-                <div class="result {{ last_result.status }}">
-                    {{ last_result.msg }}
-                </div>
+                <div class="result {{ last_result.status }}">{{ last_result.msg }}</div>
             {% endif %}
-
             <div class="quiz-area">
                 <img src="{{ url_for('static', filename='images/' + fish.id|string + '.jpg') }}" class="fish-image">
                 <form method="POST">
-                    <input type="text" name="answer" placeholder="名前をカタカナで入力" autofocus required autocomplete="off">
+                    <input type="text" name="answer" placeholder="ひらがな・カタカナで入力" autofocus required autocomplete="off">
                     <br>
                     <button type="submit" class="btn-submit">回答する</button>
                 </form>
@@ -32,8 +35,8 @@
         {% else %}
             <div class="finish-area">
                 <h2>全問終了！</h2>
-                <p>あなたの正解数: <strong>{{ score }} / 5</strong></p>
-                <a href="{{ url_for('index') }}" class="btn-reset">もう一度挑戦する</a>
+                <p>正解数: <strong>{{ score }} / {{ total }}</strong></p>
+                <a href="{{ url_for('reset') }}" class="btn-reset">タイトルへ戻る</a>
             </div>
         {% endif %}
     </div>
