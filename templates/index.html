@@ -10,26 +10,26 @@
     <video src="{{ url_for('static', filename='videos/background.mp4') }}" autoplay muted loop playsinline class="video"></video>
 
     <div class="container">
-        <h1>魚の名前を答えろ！</h1>
-
         {% if select_level %}
-            <div class="level-select">
-                <p>難易度を選んでください</p>
-                <a href="{{ url_for('start_game', level='easy') }}" class="btn-level">初級 (3問)</a><br>
-                <a href="{{ url_for('start_game', level='normal') }}" class="btn-level">中級 (5問)</a><br>
-                <a href="{{ url_for('start_game', level='hard') }}" class="btn-level">上級 (10問)</a>
-            </div>
-        {% elif not finished %}
+            {% elif not finished %}
             <p>第 {{ step }} 問 / 全 {{ total }} 問</p>
-            {% if last_result %}
-                <div class="result {{ last_result.status }}">{{ last_result.msg }}</div>
-            {% endif %}
+            {% if last_result %}<div class="result {{ last_result.status }}">{{ last_result.msg }}</div>{% endif %}
+            
             <div class="quiz-area">
                 <img src="{{ url_for('static', filename='images/' + fish.id|string + '.jpg') }}" class="fish-image">
+                
                 <form method="POST">
-                    <input type="text" name="answer" placeholder="ひらがな・カタカナで入力" autofocus required autocomplete="off">
-                    <br>
-                    <button type="submit" class="btn-submit">回答する</button>
+                    {% if choices %}
+                        <div class="choices-container">
+                            {% for c in choices %}
+                                <button type="submit" name="answer" value="{{ c }}" class="btn-choice">{{ c }}</button>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <input type="text" name="answer" placeholder="ひらがな・カタカナで入力" autofocus required autocomplete="off">
+                        <br>
+                        <button type="submit" class="btn-submit">回答する</button>
+                    {% endif %}
                 </form>
             </div>
         {% else %}
