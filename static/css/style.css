@@ -1,25 +1,32 @@
 body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    background-color: #1a1a2e;
-    color: white;
-    text-align: center;
     margin: 0;
-    padding: 20px;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background-color: black; /* 動画が読み込まれるまでの待機色 */
 }
 
 .container {
     max-width: 600px;
-    margin: 0 auto;
-    background: #16213e;
+    width: 90%;
+    /* 背景を完全に消す場合は background: none; */
+    /* 少しだけ文字を見やすくするために、超薄い黒を敷くのがおすすめです */
+    background: rgba(0, 0, 0, 0.3); 
     padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    text-align: center;
+    box-shadow: none; /* 影を消すと動画と馴染みます */
+    backdrop-filter: blur(2px); /* 背後を少しだけぼかす（おしゃれ） */
 }
 
+/* 魚の画像のサイズを少し調整して動画領域を確保 */
 .fish-image {
     width: 100%;
-    max-width: 400px;
-    border: 4px solid #0f3460;
+    max-width: 350px;
+    border: 2px solid white;
     border-radius: 10px;
     margin-bottom: 20px;
 }
@@ -69,6 +76,6 @@ button:hover {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    z-index: -1; /* -100でもOKですが、通常は-1で一番奥に行きます */
-    filter: brightness(0.6); /* 魚の写真や文字を見やすくするために少し暗くするのがおすすめです */
+    z-index: -1;
+    filter: brightness(0.7); /* 動画を少し暗くして文字を読みやすくする */
 }

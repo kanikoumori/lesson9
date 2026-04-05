@@ -22,33 +22,30 @@ FISH_DATA = [
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # ゲームの初期化：セッションにクイズリストがない場合のみ作成
-    if "quiz_list" not in session:
+    # ゲームの初期化：リセット時またはセッションがない時
+    if "quiz_list" not in session or (request.method == "GET" and not request.args.get("continue")):
         all_indices = list(range(len(FISH_DATA)))
         random.shuffle(all_indices)
-        session["quiz_list"] = all_indices[:5]  # ランダムに5問選ぶ
+        session["quiz_list"] = all_indices[:5]
         session["current_step"] = 0
         session["score"] = 0
+        session["last_result"] = None # ここで明確にNoneにする
 
     current_step = session.get("current_step", 0)
     
-    # 5問終了判定
     if current_step >= 5:
         score = session.get("score", 0)
-        # 終了時はセッションをクリアして、次回のアクセスでリセットされるようにする
         session.pop("quiz_list", None)
         return render_template("index.html", finished=True, score=score, total=5)
 
-    # 現在の問題を取得
-    fish_index = session["quiz_list"][current_step]
-    fish = FISH_DATA[fish_index]
+    fish = FISH_DATA[session["quiz_list"][current_step]]
     
+    # ここが重要：表示した直後に判定結果を消すことで、次の問題に行くまで表示されない
     last_result = session.get("last_result")
-    session["last_result"] = None
+    session["last_result"] = None 
 
     if request.method == "POST":
         user_answer = request.form.get("answer", "").strip()
-        
         if user_answer == fish["name"]:
             session["score"] = session.get("score", 0) + 1
             session["last_result"] = {"status": "correct", "msg": f"正解！これは {fish['name']} です。"}
@@ -56,13 +53,9 @@ def index():
             session["last_result"] = {"status": "wrong", "msg": f"残念！正解は {fish['name']} でした。"}
         
         session["current_step"] = current_step + 1
-        return redirect(url_for("index"))
+        return redirect(url_for("index", continue=True)) # 継続フラグ
 
-    return render_template("index.html", 
-                           fish=fish, 
-                           finished=False, 
-                           last_result=last_result, 
-                           step=current_step + 1)
+    return render_template("index.html", fish=fish, finished=False, last_result=last_result, step=current_step + 1)
 
 # リセット用ボタンなどを作りたい場合
 @app.route("/reset")
