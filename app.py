@@ -3,8 +3,8 @@ import random
 from flask import Flask, render_template, request, session, redirect, url_for
 
 app = Flask(__name__)
-# セッションを維持するための秘密鍵（適当な文字列でOK）
-app.secret_key = os.environ.get("SECRET_KEY", "fish_quiz_12345")
+# 秘密鍵を固定値に設定（Renderでのエラー回避用）
+app.secret_key = "fish_quiz_fixed_key_12345"
 
 # 魚のデータセット
 FISH_DATA = [
@@ -22,30 +22,34 @@ FISH_DATA = [
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # ゲームの初期化：リセット時またはセッションがない時
+    # ゲームの初期化
     if "quiz_list" not in session or (request.method == "GET" and not request.args.get("continue")):
         all_indices = list(range(len(FISH_DATA)))
         random.shuffle(all_indices)
         session["quiz_list"] = all_indices[:5]
         session["current_step"] = 0
         session["score"] = 0
-        session["last_result"] = None # ここで明確にNoneにする
+        session["last_result"] = None
 
     current_step = session.get("current_step", 0)
     
+    # 5問終了判定
     if current_step >= 5:
         score = session.get("score", 0)
+        # 終了時にリストを消してリセット可能にする
         session.pop("quiz_list", None)
         return render_template("index.html", finished=True, score=score, total=5)
 
-    fish = FISH_DATA[session["quiz_list"][current_step]]
+    fish_index = session["quiz_list"][current_step]
+    fish = FISH_DATA[fish_index]
     
-    # ここが重要：表示した直後に判定結果を消すことで、次の問題に行くまで表示されない
+    # 表示用の判定結果を取得し、セッションからは消す（一回切り表示）
     last_result = session.get("last_result")
-    session["last_result"] = None 
+    session["last_result"] = None
 
     if request.method == "POST":
         user_answer = request.form.get("answer", "").strip()
+        
         if user_answer == fish["name"]:
             session["score"] = session.get("score", 0) + 1
             session["last_result"] = {"status": "correct", "msg": f"正解！これは {fish['name']} です。"}
@@ -53,17 +57,15 @@ def index():
             session["last_result"] = {"status": "wrong", "msg": f"残念！正解は {fish['name']} でした。"}
         
         session["current_step"] = current_step + 1
-        return redirect(url_for("index", continue=True)) # 継続フラグ
+        return redirect(url_for("index", continue="true"))
 
-    return render_template("index.html", fish=fish, finished=False, last_result=last_result, step=current_step + 1)
-
-# リセット用ボタンなどを作りたい場合
-@app.route("/reset")
-def reset():
-    session.clear()
-    return redirect(url_for("index"))
+    return render_template("index.html", 
+                           fish=fish, 
+                           finished=False, 
+                           last_result=last_result, 
+                           step=current_step + 1)
 
 if __name__ == "__main__":
-    # Render環境ではPORT環境変数が必要
-    port = int(os.environ.get("PORT", 8000))
+    # Renderのポート指定に対応
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
