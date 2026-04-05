@@ -62,3 +62,13 @@ button:hover {
     text-decoration: none;
     font-weight: bold;
 }
+.video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1; /* -100でもOKですが、通常は-1で一番奥に行きます */
+    filter: brightness(0.6); /* 魚の写真や文字を見やすくするために少し暗くするのがおすすめです */
+}
