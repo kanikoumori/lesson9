@@ -3,9 +3,9 @@ import random
 from flask import Flask, render_template, request, session, redirect, url_for
 
 app = Flask(__name__)
-app.secret_key = "fish_quiz_mega_key_888"
+app.secret_key = "fish_quiz_final_stable_key_101"
 
-# 魚のデータセット（choicesがあるものは3択、ないものは入力形式）
+# 魚のデータセット
 FISH_DATA = [
     {"id": 1, "name": "トラフグ", "choices": ["トラフグ", "マンボウ", "バンドウイルカ"]},
     {"id": 2, "name": "ウスバハギ"}, {"id": 3, "name": "ウマヅラハギ"},
@@ -28,17 +28,22 @@ FISH_DATA = [
     {"id": 29, "name": "クロメジナ"},
 ]
 
+# ひらがなをカタカナに変換する関数
 def to_katakana(text):
+    if not text:
+        return ""
     return "".join([chr(ord(c) + 96) if "ぁ" <= c <= "ん" else c for c in text])
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    # 難易度選択チェック
     if "quiz_list" not in session:
         return render_template("index.html", select_level=True)
 
     current_step = session.get("current_step", 0)
     total_questions = session.get("total_questions", 5)
     
+    # 全問終了判定
     if current_step >= total_questions:
         score = session.get("score", 0)
         return render_template("index.html", finished=True, score=score, total=total_questions)
@@ -47,13 +52,14 @@ def index():
     fish_index = session["quiz_list"][current_step]
     fish = FISH_DATA[fish_index]
     
+    # 3択の準備
     if "choices" in fish and "current_choices" not in session:
         shuffled = list(fish["choices"])
         random.shuffle(shuffled)
         session["current_choices"] = shuffled
 
     last_result = session.get("last_result")
-    
+
     if request.method == "POST":
         action = request.form.get("action")
         
@@ -87,29 +93,28 @@ def start_game(level):
     level_map = {"easy": 3, "normal": 5, "hard": 10}
     num = level_map.get(level, 5)
     
-    # --- 出題順の制御 ---
-    # 3択用のID
     choice_ids = [1, 7, 15, 22, 25, 26]
-    # それ以外のID
     other_ids = [f["id"] for f in FISH_DATA if f["id"] not in choice_ids]
     
     random.shuffle(choice_ids)
     random.shuffle(other_ids)
     
-    # 各レベルの指定数に応じて3択問題を先頭に混ぜる
-    if level == "easy": # 1-2問目
+    if level == "easy":
         q_list = choice_ids[:2] + other_ids[:1]
-    elif level == "normal": # 1-3問目
+    elif level == "normal":
         q_list = choice_ids[:3] + other_ids[:2]
-    else: # hard: 1-3問目
+    else:
         q_list = choice_ids[:3] + other_ids[:7]
     
-    # IDをFISH_DATAのインデックスに変換
-    session["quiz_list"] = [next(i for i, f in enumerate(FISH_DATA) if f["id"] == qid) for qid in q_list]
+    session["quiz_list"] = [i for i, f in enumerate(FISH_DATA) if f["id"] in q_list]
+    # 出題順をシャッフル（3択が最初に来すぎないようにする場合）
+    random.shuffle(session["quiz_list"])
+    
     session["total_questions"] = num
     session["current_step"] = 0
     session["score"] = 0
     session.pop("current_choices", None)
+    session.pop("last_result", None)
     return redirect(url_for("index"))
 
 @app.route("/reset")
