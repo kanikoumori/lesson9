@@ -141,15 +141,19 @@ def index():
 
 @app.route("/start/<level>")
 def start_game(level):
+    # 難易度に応じた問題数を設定
     level_map = {"easy": 3, "normal": 5, "hard": 10}
     num = level_map.get(level, 5)
     
+    # 3択用のID
     choice_ids = [1, 7, 15, 22, 25, 26]
+    # それ以外のID
     other_ids = [f["id"] for f in FISH_DATA if f["id"] not in choice_ids]
     
     random.shuffle(choice_ids)
     random.shuffle(other_ids)
     
+    # 問題リストの作成
     if level == "easy":
         q_list = choice_ids[:2] + other_ids[:1]
     elif level == "normal":
@@ -157,15 +161,19 @@ def start_game(level):
     else:
         q_list = choice_ids[:3] + other_ids[:7]
     
+    # セッションの初期化
     session["quiz_list"] = [i for i, f in enumerate(FISH_DATA) if f["id"] in q_list]
-    # 出題順をシャッフル（3択が最初に来すぎないようにする場合）
-    random.shuffle(session["quiz_list"])
+    random.shuffle(session["quiz_list"]) # 出題順をシャッフル
     
     session["total_questions"] = num
     session["current_step"] = 0
     session["score"] = 0
+    session["level"] = level           # ランキング用に難易度を保存
+    session["start_time"] = time.time() # 【重要】開始時刻を記録
+    
     session.pop("current_choices", None)
     session.pop("last_result", None)
+    
     return redirect(url_for("index"))
 
 def check_if_top_five(level, score, time_taken):
@@ -227,13 +235,6 @@ def register():
     conn.commit()
     cur.close()
     conn.close()
-    return redirect(url_for("index"))
-
-@app.route("/start/<level>")
-def start_game(level):
-    # ... ( q_list 作成処理など ) ...
-    session["level"] = level
-    session["start_time"] = time.time() # 開始時刻を記録
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
