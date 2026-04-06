@@ -23,37 +23,73 @@
             </div>
 
         {% elif finished %}
-    <div class="finish-area">
-        <h2>全問終了！</h2>
-        <p class="score-display">正解数: <strong>{{ score }} / {{ total }}</strong></p>
-        <p>タイム: {{ time_taken }} 秒</p>
+            <div class="finish-area">
+                <h2>全問終了！</h2>
+                <p class="score-display">正解数: <strong>{{ score }} / {{ total }}</strong></p>
+                <p class="time-display">タイム: {{ time_taken }} 秒</p>
 
-        {% if is_new_record %}
-            <div class="new-record">
-                <h3>🏆 ランクイン！</h3>
-                <form action="{{ url_for('register') }}" method="POST">
-                    <input type="text" name="player_name" placeholder="名前を入力（10文字以内）" maxlength="10" required class="input-text">
-                    <button type="submit" class="btn-submit">ランキングに登録</button>
-                </form>
+                {% if is_new_record %}
+                    <div class="new-record">
+                        <h3>🏆 ランクイン！</h3>
+                        <form action="{{ url_for('register') }}" method="POST">
+                            <input type="text" name="player_name" placeholder="名前を入力" maxlength="10" required class="input-text">
+                            <button type="submit" class="btn-submit">ランキングに登録</button>
+                        </form>
+                    </div>
+                {% endif %}
+
+                <div class="ranking-board">
+                    <h3>{{ level|upper }} TOP 5</h3>
+                    <table>
+                        <tr><th>位</th><th>名前</th><th>点</th><th>時</th></tr>
+                        {% for r in rankings %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ r.name }}</td>
+                            <td>{{ r.score }}</td>
+                            <td>{{ r.time_taken }}s</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <a href="{{ url_for('reset') }}" class="btn-reset">タイトルへ戻る</a>
             </div>
-        {% endif %}
 
-        <div class="ranking-board">
-            <h3>{{ level|upper }} ランキング TOP 5</h3>
-            <table>
-                <tr><th>順位</th><th>名前</th><th>正解</th><th>タイム</th></tr>
-                {% for r in rankings %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ r.name }}</td>
-                    <td>{{ r.score }}</td>
-                    <td>{{ r.time_taken }}s</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        <a href="{{ url_for('reset') }}" class="btn-reset">タイトルへ戻る</a>
-    </div>
+        {% elif fish %}
+            <div class="quiz-container">
+                <p class="step-info">第 {{ step }} 問 / 全 {{ total }} 問</p>
+                
+                {% if last_result %}
+                    <div class="result {{ last_result.status }}">{{ last_result.msg }}</div>
+                {% endif %}
+
+                <div class="quiz-area">
+                    <img src="{{ url_for('static', filename='images/' + fish.id|string + '.jpg') }}" class="fish-image">
+                    
+                    {% if last_result %}
+                        <form method="POST">
+                            <button type="submit" name="action" value="next" class="btn-next">次の問題へ ＞</button>
+                        </form>
+                    {% else %}
+                        <form method="POST">
+                            {% if choices %}
+                                <div class="choices-container">
+                                    {% for c in choices %}
+                                        <button type="submit" name="answer" value="{{ c }}" class="btn-choice">{{ c }}</button>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <input type="text" name="answer" placeholder="ひらがな・カタカナで回答" autofocus required class="input-text">
+                                <button type="submit" class="btn-submit">回答する</button>
+                            {% endif %}
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+
+        {% else %}
+            <p>データが読み込めませんでした。</p>
+            <a href="{{ url_for('reset') }}" class="btn-reset">最初からやり直す</a>
         {% endif %}
     </div>
 </body>
