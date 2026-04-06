@@ -33,43 +33,45 @@ def to_katakana(text):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # セッションに 'quiz_list' がない場合は必ず難易度選択フラグを立てる
     if "quiz_list" not in session:
         return render_template("index.html", select_level=True)
 
     current_step = session.get("current_step", 0)
     total_questions = session.get("total_questions", 5)
     
-    # クイズ終了判定
     if current_step >= total_questions:
         score = session.get("score", 0)
-        # 終了画面へ
         return render_template("index.html", finished=True, score=score, total=total_questions)
 
     # 現在の問題データを取得
     fish_index = session["quiz_list"][current_step]
     fish = FISH_DATA[fish_index]
     
-    # 3択の準備
     if "choices" in fish and "current_choices" not in session:
         shuffled = list(fish["choices"])
         random.shuffle(shuffled)
         session["current_choices"] = shuffled
 
     last_result = session.get("last_result")
-    session["last_result"] = None
-
+    
     if request.method == "POST":
-        user_input = request.form.get("answer", "").strip()
-        session.pop("current_choices", None)
+        action = request.form.get("action")
         
+        # 「次の問題へ」ボタンが押された場合
+        if action == "next":
+            session["current_step"] = current_step + 1
+            session.pop("last_result", None)
+            session.pop("current_choices", None)
+            return redirect(url_for("index"))
+        
+        # 回答が送信された場合
+        user_input = request.form.get("answer", "").strip()
         if to_katakana(user_input) == fish["name"]:
             session["score"] = session.get("score", 0) + 1
             session["last_result"] = {"status": "correct", "msg": f"正解！これは {fish['name']} です。"}
         else:
             session["last_result"] = {"status": "wrong", "msg": f"残念！正解は {fish['name']} でした。"}
         
-        session["current_step"] = current_step + 1
         return redirect(url_for("index"))
 
     return render_template("index.html", 

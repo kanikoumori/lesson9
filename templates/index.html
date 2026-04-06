@@ -38,20 +38,29 @@
                 {% endif %}
 
                 <div class="quiz-area">
-                    <img src="{{ url_for('static', filename='images/' + fish.id|string + '.jpg') }}" class="fish-image">
-                    
-                    <form method="POST">
-                        {% if choices %}
-                            <div class="choices-container">
-                                {% for c in choices %}
-                                    <button type="submit" name="answer" value="{{ c }}" class="btn-choice">{{ c }}</button>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <input type="text" name="answer" placeholder="ひらがな・カタカナで入力" autofocus required autocomplete="off" class="input-text">
-                            <button type="submit" class="btn-submit">回答する</button>
-                        {% endif %}
-                    </form>
+                     <img src="{{ url_for('static', filename='images/' + fish.id|string + '.jpg') }}" class="fish-image">
+    
+                     {% if last_result %}
+                        <div class="result-container">
+                            <div class="result {{ last_result.status }}">{{ last_result.msg }}</div>
+                            <form method="POST">
+                                <button type="submit" name="action" value="next" class="btn-next">次の問題へ ＞</button>
+                             </form>
+                        </div>
+                     {% else %}
+                         <form method="POST">
+                            {% if choices %}
+                              <div class="choices-container">
+                                  {% for c in choices %}
+                                      <button type="submit" name="answer" value="{{ c }}" class="btn-choice">{{ c }}</button>
+                                  {% endfor %}
+                             </div>
+                            {% else %}
+                                <input type="text" name="answer" placeholder="ひらがな・カタカナで入力" autofocus required autocomplete="off" class="input-text">
+                                <button type="submit" class="btn-submit">回答する</button>
+                            {% endif %}
+                         </form>
+                    {% endif %}
                 </div>
             </div>
         {% endif %}

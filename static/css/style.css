@@ -83,6 +83,39 @@ body {
     transform: scale(1.03);
 }
 
+/* 次の問題へボタンのスタイル */
+.btn-next {
+    display: block;
+    width: 100%;
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #4361ee; /* 回答ボタンと色を変えて区別 */
+    color: white !important;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+}
+
+.btn-next:hover {
+    background-color: #4895ef;
+    transform: scale(1.05);
+}
+
+/* 入力ボックスのスタイル調整 */
+.input-text {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
 /* 5. 画像と結果表示 */
 .fish-image {
     width: 100%;
