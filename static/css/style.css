@@ -141,3 +141,22 @@ body {
     font-size: 1.1rem;
     color: #eeeeee;
 }
+
+.ranking-board table {
+    width: 100%;
+    margin-top: 15px;
+    border-collapse: collapse;
+    color: white;
+}
+.ranking-board th, .ranking-board td {
+    padding: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    text-align: center;
+}
+.new-record {
+    background: rgba(255, 215, 0, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid gold;
+}

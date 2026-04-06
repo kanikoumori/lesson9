@@ -64,44 +64,33 @@ def to_katakana(text):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    # 1. 難易度選択チェック
     if "quiz_list" not in session:
         return render_template("index.html", select_level=True)
 
     current_step = session.get("current_step", 0)
     total_questions = session.get("total_questions", 5)
     
-    # 全問終了判定
+    # 2. 全問終了（ランキング表示）判定
     if current_step >= total_questions:
         score = session.get("score", 0)
         start_time = session.get("start_time")
-        # クリアタイム計算
         time_taken = round(time.time() - start_time, 2) if start_time else 0
         level = session.get("level", "normal")
 
-        # ランキング圏内かチェック
         is_top_five = check_if_top_five(level, score, time_taken)
-        
-        # ランキングデータ取得
         rankings = get_rankings(level)
 
         return render_template("index.html", finished=True, score=score, 
                                total=total_questions, time_taken=time_taken,
                                is_new_record=is_top_five, rankings=rankings, level=level)
-    # 難易度選択チェック
-    if "quiz_list" not in session:
-        return render_template("index.html", select_level=True)
 
-    current_step = session.get("current_step", 0)
-    total_questions = session.get("total_questions", 5)
-    
-    # 全問終了判定
-    if current_step >= total_questions:
-        score = session.get("score", 0)
-        return render_template("index.html", finished=True, score=score, total=total_questions)
-
-    # 現在の問題データを取得
-    fish_index = session["quiz_list"][current_step]
-    fish = FISH_DATA[fish_index]
+    # 3. 現在の問題データを取得（ここが抜けていると画像が出ません）
+    try:
+        fish_index = session["quiz_list"][current_step]
+        fish = FISH_DATA[fish_index]
+    except (IndexError, KeyError):
+        return redirect(url_for("reset"))
     
     # 3択の準備
     if "choices" in fish and "current_choices" not in session:
@@ -111,17 +100,16 @@ def index():
 
     last_result = session.get("last_result")
 
+    # 4. 回答送信時の処理
     if request.method == "POST":
         action = request.form.get("action")
         
-        # 「次の問題へ」ボタンが押された場合
         if action == "next":
             session["current_step"] = current_step + 1
             session.pop("last_result", None)
             session.pop("current_choices", None)
             return redirect(url_for("index"))
         
-        # 回答が送信された場合
         user_input = request.form.get("answer", "").strip()
         if to_katakana(user_input) == fish["name"]:
             session["score"] = session.get("score", 0) + 1
@@ -131,6 +119,7 @@ def index():
         
         return redirect(url_for("index"))
 
+    # 5. クイズ画面をレンダリング（これが実行されないと中身が空になります）
     return render_template("index.html", 
                            fish=fish, 
                            finished=False, 
