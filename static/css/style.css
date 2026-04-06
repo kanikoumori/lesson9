@@ -25,36 +25,51 @@ body {
 /* 3. コンテンツの箱（ここが表示されない原因を解消） */
 .container {
     position: relative;
-    z-index: 100; /* 動画（-100）より大きな数字にして前面へ */
+    z-index: 100;
     max-width: 500px;
     width: 85%;
-    background: rgba(0, 0, 0, 0.7); /* 少し濃いめの半透明黒 */
+    background: rgba(0, 0, 0, 0.7);
     padding: 30px;
     border-radius: 20px;
     text-align: center;
-    backdrop-filter: blur(10px); /* ぼかしを強めて視認性アップ */
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
+    /* 以下の2行が重要 */
+    color: #ffffff !important; 
+    display: block !important;
 }
 
 /* 4. ボタン類 */
-.btn-level, .btn-submit, .btn-choice {
+/* 4. ボタン類 の部分を少し整理 */
+.btn-level, .btn-submit {
     display: block;
     width: 100%;
-    margin: 15px auto;
+    margin: 10px auto;
     padding: 15px;
+    background-color: #e94560;
+    color: #ffffff !important;
+    text-decoration: none;
     border: none;
     border-radius: 10px;
-    font-size: 1.1rem;
     font-weight: bold;
+    font-size: 1.1rem;
+    box-sizing: border-box;
     cursor: pointer;
     transition: 0.3s;
-    text-decoration: none;
 }
 
-.btn-level, .btn-submit {
+.btn-level {
+    display: block;
+    width: 100%;
+    margin: 10px auto;
+    padding: 15px;
     background-color: #e94560;
-    color: white;
+    color: #ffffff !important;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    box-sizing: border-box; /* 幅の計算を正確にする */
 }
 
 .btn-choice {
@@ -83,3 +98,13 @@ body {
 }
 .correct { background: rgba(40, 167, 69, 0.8); }
 .wrong { background: rgba(220, 53, 69, 0.8); }
+.main-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+.guide-text {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    color: #eeeeee;
+}

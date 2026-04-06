@@ -10,33 +10,49 @@
     <video src="{{ url_for('static', filename='videos/background.mp4') }}" autoplay muted loop playsinline class="video"></video>
 
     <div class="container">
+        <h1 class="main-title">魚の名前を答えろ！</h1>
+
         {% if select_level %}
-            {% elif not finished %}
-            <p>第 {{ step }} 問 / 全 {{ total }} 問</p>
-            {% if last_result %}<div class="result {{ last_result.status }}">{{ last_result.msg }}</div>{% endif %}
-            
-            <div class="quiz-area">
-                <img src="{{ url_for('static', filename='images/' + fish.id|string + '.jpg') }}" class="fish-image">
-                
-                <form method="POST">
-                    {% if choices %}
-                        <div class="choices-container">
-                            {% for c in choices %}
-                                <button type="submit" name="answer" value="{{ c }}" class="btn-choice">{{ c }}</button>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <input type="text" name="answer" placeholder="ひらがな・カタカナで入力" autofocus required autocomplete="off">
-                        <br>
-                        <button type="submit" class="btn-submit">回答する</button>
-                    {% endif %}
-                </form>
+            <div class="menu-area">
+                <p class="guide-text">難易度を選んでください</p>
+                <div class="level-buttons">
+                    <a href="{{ url_for('start_game', level='easy') }}" class="btn-level">初級 (3問)</a>
+                    <a href="{{ url_for('start_game', level='normal') }}" class="btn-level">中級 (5問)</a>
+                    <a href="{{ url_for('start_game', level='hard') }}" class="btn-level">上級 (10問)</a>
+                </div>
             </div>
-        {% else %}
+
+        {% elif finished %}
             <div class="finish-area">
                 <h2>全問終了！</h2>
-                <p>正解数: <strong>{{ score }} / {{ total }}</strong></p>
+                <p class="score-display">正解数: <strong>{{ score }} / {{ total }}</strong></p>
                 <a href="{{ url_for('reset') }}" class="btn-reset">タイトルへ戻る</a>
+            </div>
+
+        {% else %}
+            <div class="quiz-container">
+                <p class="step-info">第 {{ step }} 問 / 全 {{ total }} 問</p>
+                
+                {% if last_result %}
+                    <div class="result {{ last_result.status }}">{{ last_result.msg }}</div>
+                {% endif %}
+
+                <div class="quiz-area">
+                    <img src="{{ url_for('static', filename='images/' + fish.id|string + '.jpg') }}" class="fish-image">
+                    
+                    <form method="POST">
+                        {% if choices %}
+                            <div class="choices-container">
+                                {% for c in choices %}
+                                    <button type="submit" name="answer" value="{{ c }}" class="btn-choice">{{ c }}</button>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <input type="text" name="answer" placeholder="ひらがな・カタカナで入力" autofocus required autocomplete="off" class="input-text">
+                            <button type="submit" class="btn-submit">回答する</button>
+                        {% endif %}
+                    </form>
+                </div>
             </div>
         {% endif %}
     </div>

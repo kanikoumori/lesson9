@@ -33,20 +33,24 @@ def to_katakana(text):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    # セッションに 'quiz_list' がない場合は必ず難易度選択フラグを立てる
     if "quiz_list" not in session:
         return render_template("index.html", select_level=True)
 
     current_step = session.get("current_step", 0)
     total_questions = session.get("total_questions", 5)
     
+    # クイズ終了判定
     if current_step >= total_questions:
         score = session.get("score", 0)
-        session.pop("quiz_list", None)
+        # 終了画面へ
         return render_template("index.html", finished=True, score=score, total=total_questions)
 
-    fish = FISH_DATA[session["quiz_list"][current_step]]
+    # 現在の問題データを取得
+    fish_index = session["quiz_list"][current_step]
+    fish = FISH_DATA[fish_index]
     
-    # 3択が必要な場合、選択肢をシャッフルして保持（リロードで変わらないようsessionに保存）
+    # 3択の準備
     if "choices" in fish and "current_choices" not in session:
         shuffled = list(fish["choices"])
         random.shuffle(shuffled)
@@ -57,19 +61,23 @@ def index():
 
     if request.method == "POST":
         user_input = request.form.get("answer", "").strip()
-        session.pop("current_choices", None) # 回答したら選択肢をクリア
+        session.pop("current_choices", None)
         
         if to_katakana(user_input) == fish["name"]:
-            session["score"] += 1
+            session["score"] = session.get("score", 0) + 1
             session["last_result"] = {"status": "correct", "msg": f"正解！これは {fish['name']} です。"}
         else:
             session["last_result"] = {"status": "wrong", "msg": f"残念！正解は {fish['name']} でした。"}
         
-        session["current_step"] += 1
-        return redirect(url_for("index", next="step"))
+        session["current_step"] = current_step + 1
+        return redirect(url_for("index"))
 
-    return render_template("index.html", fish=fish, finished=False, last_result=last_result, 
-                           step=current_step + 1, total=total_questions,
+    return render_template("index.html", 
+                           fish=fish, 
+                           finished=False, 
+                           last_result=last_result, 
+                           step=current_step + 1, 
+                           total=total_questions,
                            choices=session.get("current_choices"))
 
 @app.route("/start/<level>")
