@@ -65,7 +65,7 @@
                     {% if last_result and last_result.status == 'correct' %}
                         <img src="{{ url_for('static', filename='images/attack.png') }}" class="attack-effect">
                         
-                        {% if step == total and score == total %}
+                        {% if score == total %}
                             <img src="{{ url_for('static', filename='images/explosion.png') }}" class="explosion-effect">
                         {% endif %}
                     {% endif %}
@@ -91,7 +91,7 @@
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                <input type="text" name="answer" placeholder="ひらがな・カタカナで回答" autofocus required class="input-text">
+                                <input type="text" name="answer" placeholder="ひらがな・カタカナで回答" autofocus required class="input-text" autocomplete="off">
                                 <button type="submit" class="btn-submit">回答する</button>
                             {% endif %}
                         </form>
