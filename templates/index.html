@@ -60,7 +60,11 @@
                 <p class="step-info">第 {{ step }} 問 / 全 {{ total }} 問</p>
                 
                 <div class="battle-stage">
-                    <img src="{{ url_for('static', filename='images/enemy.png') }}" class="enemy-sprite {% if last_result and last_result.status == 'correct' %}enemy-damaged{% endif %}" id="enemy">
+                    <img src="{{ url_for('static', filename='images/enemy.png') }}" 
+                         class="enemy-sprite 
+                                {% if last_result and last_result.status == 'correct' %}enemy-damaged{% endif %}
+                                {% if score == total %} enemy-hidden{% endif %}" 
+                         id="enemy">
                     
                     {% if last_result and last_result.status == 'correct' %}
                         <img src="{{ url_for('static', filename='images/attack.png') }}" class="attack-effect">
@@ -98,26 +102,10 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="battle-stage">
-                <img src="{{ url_for('static', filename='images/enemy.png') }}" 
-                    class="enemy-sprite 
-                        {% if last_result and last_result.status == 'correct' %}enemy-damaged{% endif %}
-                        {% if score == total %} enemy-hidden{% endif %}" 
-                    id="enemy">
-    
-                {% if last_result and last_result.status == 'correct' %}
-                    <img src="{{ url_for('static', filename='images/attack.png') }}" class="attack-effect">
-        
-                    {% if score == total %}
-                        <img src="{{ url_for('static', filename='images/explosion.png') }}" class="explosion-effect">
-                    {% endif %}
-                {% endif %}
-            </div>
+
         {% else %}
-            <div class="container">
-                <p>データが読み込めませんでした。</p>
-                <a href="{{ url_for('reset') }}" class="btn-reset">最初からやり直す</a>
-            </div>
+            <p>データが読み込めませんでした。</p>
+            <a href="{{ url_for('reset') }}" class="btn-reset">最初からやり直す</a>
         {% endif %}
     </div>
 </body>
