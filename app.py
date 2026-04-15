@@ -89,28 +89,32 @@ def check_if_top_five(level, score, time_taken):
 # --- 4. メインルート ---
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # A. 難易度選択チェック
     if "quiz_list" not in session:
         return render_template("index.html", select_level=True)
 
     current_step = session.get("current_step", 0)
     total_questions = session.get("total_questions", 5)
-    
-    # B. 全問終了判定
+
     if current_step >= total_questions:
         score = session.get("score", 0)
         start_time = session.get("start_time")
         time_taken = round(time.time() - start_time, 2) if start_time else 0
         level = session.get("level", "normal")
-        
+
         is_top_five = check_if_top_five(level, score, time_taken)
         rankings = get_rankings(level)
 
-        return render_template("index.html", finished=True, score=score, 
-                               total=total_questions, time_taken=time_taken,
-                               is_new_record=is_top_five, rankings=rankings, level=level)
+        return render_template(
+            "index.html",
+            finished=True,
+            score=score,
+            total=total_questions,
+            time_taken=time_taken,
+            is_new_record=is_top_five,
+            rankings=rankings,
+            level=level
+        )
 
-    # C. クイズデータ取得
     try:
         fish_index = session["quiz_list"][current_step]
         fish = FISH_DATA[fish_index]
@@ -124,7 +128,6 @@ def index():
 
     last_result = session.get("last_result")
 
-    # D. POST処理
     if request.method == "POST":
         action = request.form.get("action")
         if action == "next":
@@ -132,23 +135,42 @@ def index():
             session.pop("last_result", None)
             session.pop("current_choices", None)
             return redirect(url_for("index"))
-        
+
         user_input = request.form.get("answer", "").strip()
         if to_katakana(user_input) == fish["name"]:
             session["score"] = session.get("score", 0) + 1
-            session["last_result"] = {"status": "correct", "msg": f"正解！これは {fish['name']} です。"}
+            session["last_result"] = {
+                "status": "correct",
+                "msg": f"正解！これは {fish['name']} です。"
+            }
         else:
-            session["last_result"] = {"status": "wrong", "msg": f"残念！正解は {fish['name']} でした。"}
+            session["last_result"] = {
+                "status": "wrong",
+                "msg": f"残念！正解は {fish['name']} でした。"
+            }
         return redirect(url_for("index"))
 
-    # E. クイズ表示（最重要：ここが抜けていた可能性大）
-    return render_template("index.html", 
-                           fish=fish, 
-                           finished=False, 
-                           last_result=last_result, 
-                           step=current_step + 1, 
-                           total=total_questions,
-                           choices=session.get("current_choices"))
+    current_score = session.get("score", 0)
+
+    show_explosion = (
+        last_result is not None
+        and last_result.get("status") == "correct"
+        and (current_step + 1) == total_questions
+        and current_score == total_questions
+    )
+
+    return render_template(
+        "index.html",
+        fish=fish,
+        finished=False,
+        last_result=last_result,
+        step=current_step + 1,
+        total=total_questions,
+        score=current_score,
+        show_explosion=show_explosion,
+        choices=session.get("current_choices")
+    )
+
 
 @app.route("/register", methods=["POST"])
 def register():

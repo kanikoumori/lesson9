@@ -61,18 +61,18 @@
                 
                 <div class="battle-stage">
                     <img src="{{ url_for('static', filename='images/enemy.png') }}" 
-                         class="enemy-sprite 
+                        class="enemy-sprite 
                                 {% if last_result and last_result.status == 'correct' %}enemy-damaged{% endif %}
-                                {% if score == total %} enemy-hidden{% endif %}" 
-                         id="enemy">
-                    
-                    {% if last_result and last_result.status == 'correct' %}
-                        <img src="{{ url_for('static', filename='images/attack.png') }}" class="attack-effect">
-                        
-                        {% if score == total %}
-                            <img src="{{ url_for('static', filename='images/explosion.png') }}" class="explosion-effect">
-                        {% endif %}
+                                {% if show_explosion %} enemy-hidden{% endif %}" 
+                        id="enemy">
+
+                {% if last_result and last_result.status == 'correct' %}
+                    <img src="{{ url_for('static', filename='images/attack.png') }}" class="attack-effect">
+
+                    {% if show_explosion %}
+                        <img src="{{ url_for('static', filename='images/explosion.png') }}" class="explosion-effect">
                     {% endif %}
+                {% endif %}
                 </div>
 
                 {% if last_result %}
