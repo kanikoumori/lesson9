@@ -225,12 +225,18 @@ body {
 /* 爆発演出：次の問題ボタンを押すまで消えずに残る */
 .explosion-effect {
     position: absolute;
-    right: 0px;
+    right: 20px;   /* enemyと同じ */
     top: 50%;
     transform: translateY(-50%);
-    width: 220px;
-    z-index: 20;
-    animation: constant-boom 0.8s 0.6s forwards; 
+    width: 200px;
+    z-index: 30;
+    animation: boom-pop 0.6s ease-out forwards;
+    filter: drop-shadow(0 0 20px rgba(255,200,0,0.8));
+}
+@keyframes boom-pop {
+    0%   { transform: translateY(-50%) scale(0.5); opacity: 0; }
+    50%  { transform: translateY(-50%) scale(1.3); opacity: 1; }
+    100% { transform: translateY(-50%) scale(1); opacity: 1; }
 }
 
 @keyframes constant-boom {
@@ -238,7 +244,25 @@ body {
     30% { transform: translateY(-50%) scale(1.3); opacity: 1; }
     100% { transform: translateY(-50%) scale(1.2); opacity: 1; } /* 最後のコマで停止 */
 }
+.flash {
+    animation: flash 0.3s ease;
+}
 
+@keyframes flash {
+    0% { background: rgba(255,255,255,0); }
+    50% { background: rgba(255,255,255,0.3); }
+    100% { background: rgba(255,255,255,0); }
+}
+.shake {
+    animation: screen-shake 0.4s ease;
+}
+@keyframes screen-shake {
+    0% { transform: translate(0,0); }
+    25% { transform: translate(5px,-5px); }
+    50% { transform: translate(-5px,5px); }
+    75% { transform: translate(5px,5px); }
+    100% { transform: translate(0,0); }
+}
 /* 爆発時に敵を消す */
 .enemy-hidden {
     opacity: 0;

@@ -6,10 +6,10 @@
     <title>魚の名前あてクイズ</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
+<body class="{% if show_explosion %}flash{% endif %}">
     <video src="{{ url_for('static', filename='videos/background.mp4') }}" autoplay muted loop playsinline class="video"></video>
 
-    <div class="container">
+    <div class="container {% if show_explosion %}shake{% endif %}">
         <h1 class="main-title">魚の名前を答えろ！</h1>
 
         {% if select_level %}
